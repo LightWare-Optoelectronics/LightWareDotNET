@@ -72,12 +72,15 @@ namespace LightWareDotNET
 
 		private void _ThreadCloseSerialProc()
 		{
-			_serial.Close();
+			if (_serial != null)
+				_serial.Close();
 		}
 
 		public void DisconnectSerialPort()
 		{
 			// NOTE: We need to call the serial close on another thread or there will be a deadlock between the UI thread and the data received event.
+
+			// NOTE: Is it possible that this is called multiple times, and when the 2nd closer hits the serial will be null already.
 
 			if (_serial != null)
 			{	
@@ -135,6 +138,7 @@ namespace LightWareDotNET
 				//Console.WriteLine("IOException: " + E.Message);
 				// TODO: Serial error invoke? Or will that happen manually?
 				DisconnectSerialPort();
+				_SerialErrorReceived(null, null);
 			}
 			catch (Exception E)
 			{
